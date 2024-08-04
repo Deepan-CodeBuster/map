@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Details</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 400px; /* Adjust the height of the map */
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="sale">
+        <form action="/submit" method="post">
+            <label for="name">Name:</label><br>
+            <input type="text" name="username" id="name" required><br><br>
+            <label for="mail">Email:</label><br>
+            <input type="email" name="email" id="mail" required><br><br>
+            <label>Category:</label>
+            <input type="checkbox" name="electronic" value="Electronics">
+            <label>Electronics</label>
+            <input type="checkbox" name="toy" id="" value="Toys">
+            <label>Toys</label>
+            <input type="checkbox" name="electrical" value="Electricals">
+            <label>Electricals</label>
+            <input type="checkbox" name="tools" value="Tools">
+            <label>Tools</label><br><br>
+            <label for="address">Address</label><br>
+            <input type="text" id="address" name="address" required><br><br>
+            <label for="pincode">Pin code</label><br>
+            <input type="number" id="pincode" name="pincode" required><br><br>
+            <label for="description">Description</label><br>
+            <textarea id="description" name="description">message...</textarea><br><br>
+            <label for="img">Upload the images</label><br>
+            <input type="file" id="img" name="image"><br><br>
+            
+            <!-- New hidden fields for storing latitude and longitude -->
+            <input type="hid" id="latitude" name="latitude">
+            <input type="hid" id="longitude" name="longitude">
+
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <!-- Map container -->
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Function to get the user's location
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+
+        // Function to handle the position data
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+
+            document.getElementById("latitude").value = lat;
+            document.getElementById("longitude").value = lon;
+
+            // Initialize the map
+            const map = L.map('map').setView([lat, lon], 13);
+
+            // Add the tile layer to the map
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add a marker to the map at the user's location
+            L.marker([lat, lon]).addTo(map)
+                .bindPopup("You are here")
+                .openPopup();
+        }
+
+        // Function to handle geolocation errors
+        function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("User denied the request for Geolocation.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        // Call the function to get the location when the page loads
+        window.onload = getLocation;
+    </script>
+</body>
+</html>
